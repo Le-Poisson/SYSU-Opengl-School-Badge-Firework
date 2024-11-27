@@ -33,7 +33,7 @@
     <ClCompile Include="version1\src\shader.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="version1\glad.c">
+    <ClCompile Include="version1\include\glad.c">
       <Filter>头文件</Filter>
     </ClCompile>
   </ItemGroup>

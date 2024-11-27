@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="version1\glad.c" />
+    <ClCompile Include="version1\include\glad.c" />
     <ClCompile Include="version1\src\Camera.cpp" />
     <ClCompile Include="version1\src\image-loader.cpp" />
     <ClCompile Include="version1\src\launcher.cpp" />
