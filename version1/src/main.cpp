@@ -92,8 +92,6 @@ int main()
     glEnable(GL_DEPTH_TEST); // 启用深度测试
     glDepthFunc(GL_LESS); // 设置深度函数
 
-
-
     // 初始化相机
     camera = new Camera(glm::vec3(0.0f, 120.0f, -430.0f));
     projection = glm::perspective(glm::radians(FOV), (GLfloat)(SCREEN_W / SCREEN_H), NEAR_CLIP, FAR_CLIP);
