@@ -127,6 +127,8 @@ int main()
     std::vector<glm::vec3> cubeVertices;
     std::vector<unsigned int> cubeIndices;
     float d = 0.5f; // 立方体大小
+
+    #pragma region AddAllPosibleTriangles
     // 添加所有可能的三角形
     cubeVertices.push_back(glm::vec3(-d, d, d)); // 上
     cubeVertices.push_back(glm::vec3(-d, d, -d));
@@ -153,7 +155,8 @@ int main()
     cubeVertices.push_back(glm::vec3(-d, -d, d));
     cubeVertices.push_back(glm::vec3(-d, d, d));
     cubeIndices = { 0, 1, 3, 1, 2, 3, 7, 5, 4, 7, 6, 5, 11, 9, 8, 11, 10, 9, 12, 13, 15, 13, 14, 15, 16, 17, 19, 17, 18, 19, 23, 21, 20, 23, 22, 21 };
-    
+    #pragma endregion
+
     GLuint VBO;
     GLuint EBO;
     glGenVertexArrays(1, &_cubeVao);
@@ -246,6 +249,7 @@ int main()
         skyBoxTransform.scale = glm::vec3(100.f); // 调整天空盒大小
         skyBoxTransform.rotation.y -= 0.00015f; // 小幅度旋转以模拟云层移动
 
+        #pragma region BindSkyboxRenderer
         // 绑定天空盒着色器并设置矩阵
         _skyboxShader.use();
         _skyboxShader.SetMat4("projection", projection);
@@ -256,7 +260,9 @@ int main()
         glBindVertexArray(_cubeVao); // 绑定立方体VAO
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0); // 绘制天空盒
         glClear(GL_DEPTH_BUFFER_BIT); // 清除深度缓冲
+        #pragma endregion
         
+        #pragma region RenderHeightGraph
         // 渲染高度图
         Transform heightMapTransform;
         heightMapTransform.scale = glm::vec3(2.0f); // 调整高度图大小
@@ -274,6 +280,7 @@ int main()
         glBindVertexArray(0);
         glClear(GL_DEPTH_BUFFER_BIT); // 清除深度缓冲
         //!!!!!!
+        #pragma endregion
 
         glBindVertexArray(_particleVAO);
         // 更新粒子位置缓冲区

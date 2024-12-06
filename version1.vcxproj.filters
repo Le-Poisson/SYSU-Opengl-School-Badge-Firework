@@ -36,6 +36,9 @@
     <ClCompile Include="version1\include\glad.c">
       <Filter>头文件</Filter>
     </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="version1\include\Camera.h">
@@ -57,6 +60,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="version1\include\rtw_stb_image.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

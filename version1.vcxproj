@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="version1\include\glad.c" />
     <ClCompile Include="version1\src\Camera.cpp" />
     <ClCompile Include="version1\src\image-loader.cpp" />
@@ -27,6 +28,7 @@
     <ClCompile Include="version1\src\shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="PointLight.h" />
     <ClInclude Include="version1\include\Camera.h" />
     <ClInclude Include="version1\include\image-loader.h" />
     <ClInclude Include="version1\include\launcher.h" />
