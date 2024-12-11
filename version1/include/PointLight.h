@@ -1,8 +1,6 @@
 #pragma once
 #define GLM_ENABLE_EXPERIMENTAL
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <GLFW/glfw3.h>
+#include "shader.h"
 
 class Shader;
 
@@ -26,7 +24,7 @@ public:
 
 	float distance(const Position& fragment); // Calculate DISTANCE between light & fragment.
 	Color calcAddColor(const Position& fragment, const Direction& normal); // Calculate COLOR should be ADDED on the fragment.
-	bool addToShader(Shader& shader, const int index);
+	bool addToShader(Shader* shader, const int index);
 
 public:
 	Color _color;

@@ -1,3 +1,4 @@
+#include <glad/glad.h>
 #include "shader.h"
 
 // 着色器构造函数，接收顶点和片段着色器路径
