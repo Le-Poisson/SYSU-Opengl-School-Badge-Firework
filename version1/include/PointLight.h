@@ -4,6 +4,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 
+class Shader;
+
 using Color = glm::vec3;
 using Position = glm::vec3;
 using Attenuation = glm::vec3;
@@ -22,8 +24,9 @@ public:
 	// Unable to Set. 
 	#pragma endregion
 
-	float distance(Position fragment); // Calculate DISTANCE between light & fragment.
-	Color calcAddColor(Position fragment, Direction normal); // Calculate COLOR should be ADDED on the fragment.
+	float distance(const Position& fragment); // Calculate DISTANCE between light & fragment.
+	Color calcAddColor(const Position& fragment, const Direction& normal); // Calculate COLOR should be ADDED on the fragment.
+	bool addToShader(Shader& shader, const int index);
 
 public:
 	Color _color;

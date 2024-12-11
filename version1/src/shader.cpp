@@ -104,12 +104,19 @@ void Shader::setFloat(const std::string& name, float value) const
     glUniform1f(glGetUniformLocation(id, name.c_str()), value); // 设置浮点值
 }
 
-// 设置4x4矩阵uniform变量
+// 设置4x4矩阵 uniform 变量
 void Shader::SetMat4(const std::string& name, glm::mat4 value) {
     glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, &value[0][0]);
 }
 
-// 设置3D向量uniform变量
+// 设置3D向量 uniform 变量
 void Shader::SetVec3(const std::string& name, const glm::vec3& value) {
     glUniform3fv(glGetUniformLocation(id, name.c_str()), 1, &value[0]);
+}
+
+int Shader::getInt(const std::string& name) const
+{
+    GLint value;
+    glGetUniformiv(id, glGetUniformLocation(id, name.c_str()), &value);
+    return value;
 }

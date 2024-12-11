@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "camera.h"
+#include "PointLight.h"
 
 static const unsigned int maxParticles = 70000;
 static const float GRAVITY = 9.81f;
@@ -43,6 +44,7 @@ struct Particle {
 	unsigned char r, g, b, a;
 	float size, life, trailTime, cameraDst;
 	Type type;
+	PointLight* pointLight = nullptr; //Add: YuZhuZhi
 
 	bool operator<(const Particle& right) const {
 		return this->cameraDst > right.cameraDst;
@@ -54,6 +56,7 @@ class Launcher
 public:
 	Launcher();
 	Launcher(glm::vec3 position);
+	~Launcher();
 
 	void renderTrails(Particle& p, float deltaTime);
 	void spawnParticle(glm::vec3 position, glm::vec3 speed, glm::vec4 color, float size, float life, Particle::Type type);
@@ -100,6 +103,9 @@ private:
 	float explosionSpread = 10.0f;   /* spread of explosion blow */
 	float launchSpread = 40.0f;     /* spread of launch direction */
 	float launchSpeed = 160.0f;      /* speed of launch direction */
+
+	/* PointLights: YuZhuZhi */
+	std::vector<PointLight*> pointLights;
 
 	/* Do not touch */
 	std::unique_ptr<Particle[]> particles{ new Particle[maxParticles] };

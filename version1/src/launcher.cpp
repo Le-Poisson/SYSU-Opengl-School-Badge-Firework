@@ -38,6 +38,13 @@ Launcher::Launcher(glm::vec3 position)
 	}
 }
 
+// Add: YuZhuZhi
+Launcher::~Launcher()
+{
+	for (PointLight* light : pointLights) delete light;
+	pointLights.clear();
+}
+
 // 模拟粒子的运动
 void Launcher::simulate(Camera& camera, GLfloat* particle_position, GLubyte* particle_color)
 {
@@ -57,6 +64,15 @@ void Launcher::simulate(Camera& camera, GLfloat* particle_position, GLubyte* par
 			p.cameraDst = glm::distance(p.pos, camera.getPosition()); // 更新与相机的距离
 
 			renderTrails(p, deltaTime); // 渲染拖尾
+
+			if (p.type == Particle::Type::LAUNCHING && fabs(p.speed.y) < 0.1f && !p.pointLight) { // Add: YuZhuZhi
+				p.pointLight = new PointLight(
+					glm::vec3(p.r, p.g, p.b), // 光的颜色
+					p.pos,                   // 光的位置
+					glm::vec3(1.0f, 0.1f, 0.05f) // 光的衰减参数
+				);
+				pointLights.push_back(p.pointLight); // 添加到集中管理
+			}
 
 			// 填充GPU缓冲区
 			particle_position[4 * particlesCount + 0] = p.pos.x;
@@ -89,6 +105,15 @@ void Launcher::simulate(Camera& camera, GLfloat* particle_position, GLubyte* par
 			particlesCount++; // 增加粒子计数
 			p.life -= deltaTime; // 减少生命值
 			continue;
+		}
+
+		if (p.pointLight) {  // Add: YuZhuZhi
+			auto it = std::find(pointLights.begin(), pointLights.end(), p.pointLight);
+			if (it != pointLights.end()) {
+				pointLights.erase(it);
+			}
+			delete p.pointLight; // 删除点光源
+			p.pointLight = nullptr;
 		}
 
 		// 粒子刚刚死亡
@@ -224,6 +249,11 @@ void Launcher::update(Camera& camera, GLfloat* particle_position, GLubyte* parti
 	}
 
 	simulate(camera, particle_position, particle_color); // 模拟粒子
+
+	//for (PointLight* light : pointLights) { // Add: YuZhuZhi
+	//	// 调用渲染系统的方法，例如：renderLight(light);
+	//}
+
 	sortParticles(); // 排序粒子
 }
 
