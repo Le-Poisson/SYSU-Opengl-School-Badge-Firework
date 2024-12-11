@@ -2,6 +2,8 @@
 #include "irrKlang/include/irrKlang.h"
 
 #include <glm/gtx/string_cast.hpp>
+#include <algorithm>
+#include <iostream>
 
 using namespace irrklang;
 
@@ -38,12 +40,33 @@ Launcher::Launcher(glm::vec3 position)
 	}
 }
 
-// Add: YuZhuZhi
-Launcher::~Launcher()
+Launcher::Launcher(std::shared_ptr<Shader> shader)
+	: Launcher()
 {
-	for (PointLight* light : pointLights) delete light;
-	pointLights.clear();
+	this->shader = shader;
+	auto zeroPointLight = PointLight();
+	for (int i = 0; i < MAX_LIGHTS; i++) {
+		zeroPointLight.addToShader(shader, i);
+	}
 }
+
+Launcher::Launcher(glm::vec3 position, std::shared_ptr<Shader> shader)
+	: Launcher(position)
+{
+	this->shader = shader;
+	auto zeroPointLight = PointLight();
+	for (int i = 0; i < MAX_LIGHTS; i++) {
+		zeroPointLight.addToShader(shader, i);
+	}
+}
+
+
+// Add: YuZhuZhi
+//Launcher::~Launcher()
+//{
+//	for (auto& light : pointLights) delete light;
+//	pointLights.clear();
+//}
 
 // 模拟粒子的运动
 void Launcher::simulate(Camera& camera, GLfloat* particle_position, GLubyte* particle_color)
@@ -64,15 +87,6 @@ void Launcher::simulate(Camera& camera, GLfloat* particle_position, GLubyte* par
 			p.cameraDst = glm::distance(p.pos, camera.getPosition()); // 更新与相机的距离
 
 			renderTrails(p, deltaTime); // 渲染拖尾
-
-			if (p.type == Particle::Type::LAUNCHING && fabs(p.speed.y) < 0.1f && !p.pointLight) { // Add: YuZhuZhi
-				p.pointLight = new PointLight(
-					glm::vec3(p.r, p.g, p.b), // 光的颜色
-					p.pos,                   // 光的位置
-					glm::vec3(1.0f, 0.1f, 0.05f) // 光的衰减参数
-				);
-				pointLights.push_back(p.pointLight); // 添加到集中管理
-			}
 
 			// 填充GPU缓冲区
 			particle_position[4 * particlesCount + 0] = p.pos.x;
@@ -107,20 +121,19 @@ void Launcher::simulate(Camera& camera, GLfloat* particle_position, GLubyte* par
 			continue;
 		}
 
-		if (p.pointLight) {  // Add: YuZhuZhi
-			auto it = std::find(pointLights.begin(), pointLights.end(), p.pointLight);
-			if (it != pointLights.end()) {
-				pointLights.erase(it);
-			}
-			delete p.pointLight; // 删除点光源
-			p.pointLight = nullptr;
-		}
-
 		// 粒子刚刚死亡
 		if (p.type == Particle::Type::LAUNCHING)
 			explode(p); // 处理爆炸
 
 		p.type = Particle::Type::DEAD; // 设置为死亡
+
+		if (p.pointLight) {  // 删除点光源 Add: YuZhuZhi
+			int index = std::find(pointLights.begin(), pointLights.end(), p.pointLight) - pointLights.begin();
+			p.pointLight->deleteFromShader(shader, index);
+			if (index != pointLights.size()) pointLights[index] = nullptr;
+			p.pointLight = nullptr;
+		}
+
 		p.cameraDst = -1.0f; // 重置与相机的距离
 	}
 }
@@ -167,6 +180,20 @@ void Launcher::explode(Particle& p)
 	int randomSound = getRandomNumber(1, 6); // 随机选择爆炸声音
 	soundEngine->play2D(explosionSounds[randomSound - 1]); // 播放爆炸声音
 
+	if (!p.pointLight) { // Add: YuZhuZhi
+		// 添加点光源
+		p.pointLight = std::make_shared<PointLight>(
+			glm::vec3(p.r, p.g, p.b), // 光的颜色
+			p.pos,                   // 光的位置
+			glm::vec3(1.0f, 0.1f, 0.05f) // 光的衰减参数
+		);
+		auto it = std::find(pointLights.begin(), pointLights.end(), nullptr);
+		if (it != pointLights.end()) { // 添加到集中管理
+			*it = p.pointLight;
+			p.pointLight->addToShader(shader, it - pointLights.begin());
+		}
+	}
+
 	float randSize = getRandomNumber(0, explosionSpread); // 随机扩散范围
 	for (int i = 0; i < sparklesPerExplosion; i++)
 	{
@@ -186,6 +213,7 @@ void Launcher::explode(Particle& p)
 			sparkleLife + randLife,
 			Particle::Type::SPARKLE
 		);
+
 	}
 }
 

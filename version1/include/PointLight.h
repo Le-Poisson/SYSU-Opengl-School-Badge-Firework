@@ -1,8 +1,8 @@
 #pragma once
 #define GLM_ENABLE_EXPERIMENTAL
-#include "shader.h"
 
-class Shader;
+#include "Constant.h"
+#include "shader.h"
 
 using Color = glm::vec3;
 using Position = glm::vec3;
@@ -12,6 +12,7 @@ using Direction = glm::vec3;
 class PointLight
 {
 public:
+	PointLight();
 	PointLight(const Color& color, const Position& position, const Attenuation& attenuation);
 	~PointLight() = default;
 
@@ -24,7 +25,9 @@ public:
 
 	float distance(const Position& fragment); // Calculate DISTANCE between light & fragment.
 	Color calcAddColor(const Position& fragment, const Direction& normal); // Calculate COLOR should be ADDED on the fragment.
-	bool addToShader(Shader* shader, const int index);
+	
+	bool addToShader(const std::shared_ptr<Shader> shader, const int index);
+	bool deleteFromShader(const std::shared_ptr<Shader> shader, const int index);
 
 public:
 	Color _color;

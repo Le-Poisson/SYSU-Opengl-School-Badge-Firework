@@ -13,6 +13,7 @@
 #include <map>
 
 #include "camera.h"
+#include "Constant.h"
 #include "shader.h"
 #include "utils.h"
 #include "launcher.h"
@@ -37,7 +38,6 @@ const float FAR_CLIP = 1000.0f;
 // 鼠标位置和相机角度
 double lastXPos = SCREEN_W / 2, lastYPos = SCREEN_H / 2;
 double yaw = 110.0f, pitch = 35.0f, xPos, yPos;
-unsigned int Launcher::particlesCount = 0; // 粒子计数
 
 Camera* camera; // 相机对象
 glm::highp_mat4 projection; // 投影矩阵
@@ -54,6 +54,7 @@ glm::vec3 lightPos = glm::vec3(0.0f, 500.0f, 0.0f); // 光源位置
 glm::vec3 lightColor = glm::vec3(1.5f, 1.5f, 1.5f); // 光源颜色
 //!!!!!!
 
+unsigned int Launcher::particlesCount = 0; // 粒子计数
 
 int main()
 {
@@ -212,7 +213,7 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, particles_color_buffer);
     glBufferData(GL_ARRAY_BUFFER, maxParticles * 4 * sizeof(GLubyte), NULL, GL_STREAM_DRAW);
 
-    Launcher launcher; // 粒子发射器
+    Launcher launcher(std::make_shared<Shader>(_terrainShader)); // 粒子发射器
     int nbFrames = 0; // 帧计数
     double lastTime = glfwGetTime(); // FPS计算的时间
 

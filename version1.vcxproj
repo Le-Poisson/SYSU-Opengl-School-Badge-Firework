@@ -36,6 +36,7 @@
     <ClInclude Include="version1\include\shader.h" />
     <ClInclude Include="version1\include\stb_image.h" />
     <ClInclude Include="version1\include\utils.h" />
+    <ClInclude Include="version1\include\Constant.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="version1\shaders\cube.frag" />

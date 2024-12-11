@@ -26,15 +26,38 @@ float FogFactor(float d) {
 }
 
 // 计算点光源的光照贡献 Add: YuZhuZhi
-vec3 calcPointLightLighting(PointLight light, vec3 fragPos, vec3 normal) {
+vec3 calcPointLightLighting(PointLight light, vec3 fragPos, vec3 normal, vec3 viewPos) {
+    // 计算光源到片段的方向
     vec3 lightDir = normalize(light.position - fragPos);
+
+    // 漫反射计算
     float diff = max(dot(normal, lightDir), 0.0);
     
+    // 计算光源到片段的距离
     float distance = length(light.position - fragPos);
+    
+    // 计算光源的衰减
     float attenuation = 1.0 / (light.attenuation.x + light.attenuation.y * distance + light.attenuation.z * distance * distance);
 
+    // 漫反射部分
     vec3 diffuse = diff * light.color * attenuation; // 漫反射
-    return diffuse;
+
+    // 计算视角方向
+    vec3 viewDir = normalize(viewPos - fragPos);
+
+    // 计算半程向量（Blinn-Phong模型）
+    vec3 halfDir = normalize(lightDir + viewDir);
+
+    // 高光计算
+    float specularStrength = 0.5; // 高光强度
+    float shininess = 32.0; // 粗糙度
+    float spec = pow(max(dot(normal, halfDir), 0.0), shininess); // 高光部分
+
+    // 高光部分
+    vec3 specular = specularStrength * spec * light.color * attenuation;
+
+    // 返回计算的漫反射和高光部分的总和
+    return diffuse + specular;
 }
 
 void main() {
@@ -65,9 +88,9 @@ void main() {
 
     // 计算来自点光源的光照 Add: YuZhuZhi
     vec3 pointLighting = vec3(0.0);
-    for (int i = 0; i < numPointLights; i++) {
-        pointLighting += calcPointLightLighting(pointLights[i], WorldPos, normal);
-    }
+    //for (int i = 0; i < MAX_LIGHTS; i++) {
+        //pointLighting += calcPointLightLighting(pointLights[i], WorldPos, normal, viewPos);
+    //}
 
     vec3 lighting = ambient + diffuse + specular + pointLighting; // 总光照
 

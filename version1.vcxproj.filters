@@ -65,6 +65,9 @@
     <ClInclude Include="version1\include\PointLight.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="version1\include\Constant.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="version1\shaders\cube.frag">

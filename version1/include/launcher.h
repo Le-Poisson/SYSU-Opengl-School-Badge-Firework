@@ -3,11 +3,11 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
-#include <iostream>
-#include <vector>
-#include <algorithm>
+#include <array>
+#include <memory>
 
 #include "camera.h"
+#include "Constant.h"
 #include "PointLight.h"
 
 static const unsigned int maxParticles = 70000;
@@ -44,7 +44,7 @@ struct Particle {
 	unsigned char r, g, b, a;
 	float size, life, trailTime, cameraDst;
 	Type type;
-	PointLight* pointLight = nullptr; //Add: YuZhuZhi
+	std::shared_ptr<PointLight> pointLight = nullptr; //Add: YuZhuZhi
 
 	bool operator<(const Particle& right) const {
 		return this->cameraDst > right.cameraDst;
@@ -56,7 +56,9 @@ class Launcher
 public:
 	Launcher();
 	Launcher(glm::vec3 position);
-	~Launcher();
+	Launcher(std::shared_ptr<Shader> shader);
+	Launcher(glm::vec3 position, std::shared_ptr<Shader> shader);
+	//~Launcher();
 
 	void renderTrails(Particle& p, float deltaTime);
 	void spawnParticle(glm::vec3 position, glm::vec3 speed, glm::vec4 color, float size, float life, Particle::Type type);
@@ -105,7 +107,8 @@ private:
 	float launchSpeed = 160.0f;      /* speed of launch direction */
 
 	/* PointLights: YuZhuZhi */
-	std::vector<PointLight*> pointLights;
+	std::array<std::shared_ptr<PointLight>, MAX_LIGHTS> pointLights;
+	std::shared_ptr<Shader> shader;
 
 	/* Do not touch */
 	std::unique_ptr<Particle[]> particles{ new Particle[maxParticles] };
