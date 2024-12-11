@@ -127,13 +127,6 @@ void Launcher::simulate(Camera& camera, GLfloat* particle_position, GLubyte* par
 
 		p.type = Particle::Type::DEAD; // 设置为死亡
 
-		if (p.pointLight) {  // 删除点光源 Add: YuZhuZhi
-			int index = std::find(pointLights.begin(), pointLights.end(), p.pointLight) - pointLights.begin();
-			p.pointLight->deleteFromShader(shader, index);
-			if (index != pointLights.size()) pointLights[index] = nullptr;
-			p.pointLight = nullptr;
-		}
-
 		p.cameraDst = -1.0f; // 重置与相机的距离
 	}
 }
@@ -180,18 +173,17 @@ void Launcher::explode(Particle& p)
 	int randomSound = getRandomNumber(1, 6); // 随机选择爆炸声音
 	soundEngine->play2D(explosionSounds[randomSound - 1]); // 播放爆炸声音
 
-	if (!p.pointLight) { // Add: YuZhuZhi
-		// 添加点光源
-		p.pointLight = std::make_shared<PointLight>(
-			Color(p.r, p.g, p.b), // 光的颜色
-			p.pos,                   // 光的位置
-			Attenuation(1.0f, 0.007f, 0.0002f) // 光的衰减参数
-		);
-		auto it = std::find(pointLights.begin(), pointLights.end(), nullptr);
-		if (it != pointLights.end()) { // 添加到集中管理
-			*it = p.pointLight;
-			p.pointLight->addToShader(shader, it - pointLights.begin());
-		}
+	// 添加点光源 Add: YuZhuZhi
+	auto pointLight = std::make_shared<PointLight>(
+		Color(p.r, p.g, p.b), // 光的颜色
+		p.pos,                   // 光的位置
+		Attenuation(1.0f, 0.007f, 0.0002f), // 光的衰减参数
+		sparkleLife + 0.75
+	);
+	auto it = std::find(pointLights.begin(), pointLights.end(), nullptr);
+	if (it != pointLights.end()) { // 添加到集中管理
+		*it = pointLight;
+		pointLight->addToShader(shader, it - pointLights.begin());
 	}
 
 	float randSize = getRandomNumber(0, explosionSpread); // 随机扩散范围
@@ -278,9 +270,13 @@ void Launcher::update(Camera& camera, GLfloat* particle_position, GLubyte* parti
 
 	simulate(camera, particle_position, particle_color); // 模拟粒子
 
-	//for (PointLight* light : pointLights) { // Add: YuZhuZhi
-	//	// 调用渲染系统的方法，例如：renderLight(light);
-	//}
+	for (auto light = pointLights.begin(); light != pointLights.end(); light++) { // Add: YuZhuZhi
+		if (light->get() && !(light->get()->updateLife(deltaTime))) { // 删除点光源
+			int index = light - pointLights.begin();
+			light->get()->deleteFromShader(shader, index);
+			pointLights[index] = nullptr;
+		}
+	}
 
 	sortParticles(); // 排序粒子
 }

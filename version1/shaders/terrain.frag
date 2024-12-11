@@ -34,7 +34,7 @@ vec3 calcPointLightLighting(PointLight light, vec3 fragColor, vec3 fragPos, vec3
     vec3 viewDir = normalize(viewPos - fragPos); // 计算视角方向
     vec3 halfDir = normalize(lightDir + viewDir); // 半程向量
 
-    // 计算光源的衰减
+    // 计算光源的衰减(这个参数计算结果有问题，可能根本没有设置到pointLights数组)
     float attenuation = 1.0 / (light.attenuation.x + light.attenuation.y * distance + light.attenuation.z * distance * distance);
 
     vec3 ambient = light.color * fragColor;
@@ -54,7 +54,8 @@ vec3 calcPointLightLighting(PointLight light, vec3 fragColor, vec3 fragPos, vec3
     vec3 specular = specularStrength * spec * light.color * fragColor;
 
     // 返回计算的漫反射和高光部分的总和
-    return (ambient + diffuse + specular);
+    //return (ambient + diffuse + specular) * attenuation;
+    return ambient;
 }
 
 void main() {
