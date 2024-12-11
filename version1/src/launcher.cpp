@@ -183,9 +183,9 @@ void Launcher::explode(Particle& p)
 	if (!p.pointLight) { // Add: YuZhuZhi
 		// 添加点光源
 		p.pointLight = std::make_shared<PointLight>(
-			glm::vec3(p.r, p.g, p.b), // 光的颜色
+			Color(p.r, p.g, p.b), // 光的颜色
 			p.pos,                   // 光的位置
-			glm::vec3(1.0f, 0.1f, 0.05f) // 光的衰减参数
+			Attenuation(1.0f, 0.007f, 0.0002f) // 光的衰减参数
 		);
 		auto it = std::find(pointLights.begin(), pointLights.end(), nullptr);
 		if (it != pointLights.end()) { // 添加到集中管理

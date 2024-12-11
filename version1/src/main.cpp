@@ -13,7 +13,6 @@
 #include <map>
 
 #include "camera.h"
-#include "Constant.h"
 #include "shader.h"
 #include "utils.h"
 #include "launcher.h"

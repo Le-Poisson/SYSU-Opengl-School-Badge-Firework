@@ -3,7 +3,7 @@
 #include "PointLight.h"
 
 PointLight::PointLight()
-    :_color(Color(0.0f)), _position(Position(0.0f)), _attenuation(Attenuation(0.0f)) {}
+    :_color(Color(255.0f, 0.0f, 0.0f)), _position(Position(10.0f)), _attenuation(Attenuation(1.0f, 0.007f, 0.0002f)) {}
 
 PointLight::PointLight(const Color& color, const Position& position, const Attenuation& attenuation)
 	:_color(color), _position(position), _attenuation(attenuation) {}
@@ -32,7 +32,7 @@ bool PointLight::addToShader(const std::shared_ptr<Shader> shader, const int ind
     shader->SetVec3("pointLights[" + std::to_string(index) + "].attenuation", _attenuation); // 设置衰减
 
     // 增加点光源数量
-    shader->setInt("numPointLights", numPointLights + 1);
+    //shader->setInt("numPointLights", numPointLights + 1);
     return true;
 }
 
