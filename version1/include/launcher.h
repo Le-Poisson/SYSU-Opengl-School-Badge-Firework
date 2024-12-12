@@ -44,7 +44,6 @@ struct Particle {
 	unsigned char r, g, b, a;
 	float size, life, trailTime, cameraDst;
 	Type type;
-	std::shared_ptr<PointLight> pointLight = nullptr; //Add: YuZhuZhi
 
 	bool operator<(const Particle& right) const {
 		return this->cameraDst > right.cameraDst;
