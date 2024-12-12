@@ -177,7 +177,7 @@ void Launcher::explode(Particle& p)
 	auto pointLight = std::make_shared<PointLight>(
 		Color(p.r, p.g, p.b), // 光的颜色
 		p.pos,                   // 光的位置
-		Attenuation(1.0f, 0.007f, 0.0002f), // 光的衰减参数
+		Attenuation(1.0f, 0.014f, 0.007f), // 光的衰减参数
 		sparkleLife + 0.75
 	);
 	auto it = std::find(pointLights.begin(), pointLights.end(), nullptr);

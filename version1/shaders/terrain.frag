@@ -15,7 +15,6 @@ struct PointLight { // Add: YuZhuZhi
 
 #define MAX_LIGHTS 10 // 支持的最大点光源数量
 uniform PointLight pointLights[MAX_LIGHTS];
-//uniform int numPointLights = 0; // 当前有效点光源数量
 
 layout (binding = 0) uniform sampler2D normalTexture;
 
@@ -54,8 +53,7 @@ vec3 calcPointLightLighting(PointLight light, vec3 fragColor, vec3 fragPos, vec3
     vec3 specular = specularStrength * spec * light.color * fragColor;
 
     // 返回计算的漫反射和高光部分的总和
-    //return (ambient + diffuse + specular) * attenuation;
-    return ambient;
+    return (ambient + diffuse + specular) * attenuation;
 }
 
 void main() {
