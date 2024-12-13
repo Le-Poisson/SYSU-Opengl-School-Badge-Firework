@@ -1,0 +1,16 @@
+std::vector<glm::vec3> pattern = {
+	basePos + size*glm::vec3(48.0, 51.7, 0),
+	basePos + size*glm::vec3(54.0, 50.7, 0),
+	basePos + size*glm::vec3(57.0, 43.7, 0),
+	basePos + size*glm::vec3(51.0, 41.7, 0),
+	basePos + size*glm::vec3(53.0, 36.7, 0),
+	basePos + size*glm::vec3(42.0, 34.7, 0),
+	basePos + size*glm::vec3(46.0, 34.7, 0),
+	basePos + size*glm::vec3(61.0, 33.7, 0),
+	basePos + size*glm::vec3(45.0, 32.7, 0),
+	basePos + size*glm::vec3(62.0, 30.700000000000003, 0),
+	basePos + size*glm::vec3(56.0, 27.700000000000003, 0),
+	basePos + size*glm::vec3(42.0, 24.700000000000003, 0),
+	basePos + size*glm::vec3(58.0, 24.700000000000003, 0),
+	basePos + size*glm::vec3(64.0, 24.700000000000003, 0),
+};
