@@ -53,7 +53,7 @@
   )
 )
 
-== 基础(待补充)
+== 基础
 
 我们寻找得到了分别实现烟花系统和天空地面的示范性代码，通过结合Assignment 0中对OpenGL相关基本功能的构建，成功实现了基础功能：即粒子与烟花系统，天空盒与地面，全局点光源，以及地面对全局点光源的反射。
 
@@ -118,7 +118,93 @@ void main() {
 }
 ```
 
-== 烟花的点光源
+=== 烟花类```CPP class Laucher```的相关逻辑
+
+首先先看粒子的结构体：
+
+```CPP
+struct Particle {
+	enum Type { LAUNCHING, SPARKLE, TRAIL, FOUNTAIN, DEAD };
+
+	glm::vec3 pos, speed;
+	unsigned char r, g, b, a;
+	float size, life, trailTime, cameraDst;
+	Type type;
+
+	bool operator<(const Particle& right) const {
+		return this->cameraDst > right.cameraDst;
+	}
+};
+```
+
+粒子需要和烟花类型绑定，所以使用Type枚举来区分。这些类型分别指示了粒子的性质：
+
+#figure(
+  tablex(
+    columns: 3,
+    align: center + horizon,
+    auto-vlines: false,
+    //header-rows: 2,
+
+    [枚举类型], [], [解释],
+    [```CPP LAUNCHING```], [], [会爆炸的烟花所持有的粒子],
+    [```CPP SPARKLE```], [], [烟花爆炸后产生的火花粒子],
+    [```CPP TRAIL```], [], [烟花上升过程的拖尾粒子],
+    [```CPP FOUNTAIN```], [], [喷泉型烟花持有的粒子],
+    [```CPP DEAD```], [], [未使用或已死亡的粒子],
+  )
+)
+
+而粒子应具有的基本属性有：位置、速度、大小、生命，以及上述所提的类型。当然，颜色也很重要，这里使用的直接是分立的`r, g, b, a`值，而不是封装到`glm::vec4`中。
+
+`cameraDst`用于优化渲染。在渲染前会按照这个属性对所有粒子排序，越近的粒子越早渲染。
+
+接下来直接看烟花类```CPP class Laucher```中的成员函数：
+
+```CPP
+class Launcher
+{
+public:
+	Launcher();
+	Launcher(glm::vec3 position);
+	Launcher(std::shared_ptr<Shader> shader);
+	Launcher(glm::vec3 position, std::shared_ptr<Shader> shader);
+	//~Launcher();
+
+	void renderTrails(Particle& p, float deltaTime);
+	void spawnParticle(glm::vec3 position, glm::vec3 speed, glm::vec4 color, float size, float life, Particle::Type type);
+	void explode(Particle& p);
+	void launchFirework();
+	void launchFountain();
+
+	void simulate(Camera &camera, GLfloat* particle_position, GLubyte* particle_color);
+	void update(Camera &camera, GLfloat* particle_position, GLubyte* particle_color);
+
+	void sortParticles();
+	int findUnusedParticle();
+}
+```
+
+这其中最重要的函数是```CPP update(...)```和```CPP simulate(...)```。首先说明这些函数的调用关系：
+
+$ "update"->cases(
+  "launchFirework"->"spawnParticle", 
+  "launchFountain"->"spawnParticle",
+  "simulate"-> cases(
+    "renderTrails"->"spawnParticle",
+    "explode"->"spawnParticle"
+  ),
+  "sortParticles"
+) $
+
+其中```CPP spawnParticle(...)```中会调用```CPP findUnusedParticle(...)```，为避免繁琐就不在上面关系图中标出。
+
+```CPP update(...)```应在每一帧渲染时由外部创建者(即主函数)调用，用于更新类中持有的两种类型烟花发射器，所有粒子(和点光源，这会在 @PointLight 中说明)。
+
+更新所有粒子的功能由```CPP simulate(...)```实现。例如，正在上升的粒子受重力影响，速度会减小；某些粒子生命耗尽死亡在空中爆炸。而爆炸效果由```CPP explode(...)```实现。在这个函数中，会在爆炸中心创建点光源(在 @PointLight 中说明)，并生成爆炸产生的粒子(即由大部分函数都会调用的```CPP spawnParticle(...)```实现)。
+粒子死亡后，手动将type设为DEAD。
+
+== 烟花的点光源 <PointLight>
 
 为了实现烟花的光效，我们首先构造了点光源类`PointLight`：
 
@@ -303,6 +389,11 @@ void Launcher::update(Camera& camera, GLfloat* particle_position, GLubyte* parti
 
 以上就基本完成了点光源相关的逻辑。
 
+#figure(
+  image("image/地面反射烟花.png"),
+  caption: [地面对烟花点光源的反射 \ 左中右分别为不同时间的截图]
+)
+
 === 遇到的困难
 
 原先我们希望每一个爆炸的粒子都创建一个点光源，这就要求烟花类```CPP class Launcher```中对点光源的管理的数据结构是动态数组```CPP std::vector```。但是，`GLSL`中并没有动态数组，只有静态裸数组。因此，为了与着色器对应，我们只能也在烟花类中用相似的数据结构，即`std::array`，并且限定相同的大小。
@@ -317,7 +408,32 @@ void Launcher::update(Camera& camera, GLfloat* particle_position, GLubyte* parti
 
 == 高斯模糊(待补充)
 
+由于在本项目中，烟花爆炸时产生的点光源并不具有材质，因此基于HDR的泛光并没有使用的前提条件。所以我们直接使用后处理来实现，即直接对输出的像素应用高斯模糊。为此，我们创建了高斯模糊的片段着色器`gaussian_blur.frag`：
 
+```GLSL
+#version 460
+out vec4 FragColor;
+in vec2 TexCoords;
+
+uniform sampler2D screenTexture;
+uniform vec2 texOffset[24]; // 使用 24 个偏移量 (4*5 - 1)
+
+void main()
+{
+    vec3 result = texture(screenTexture, TexCoords).rgb * 0.427027; // 中心像素权重
+
+    // 5x5 核心采样偏移
+    float weights[5] = float[](0.227027, 0.1945946, 0.1216216, 0.054054, 0.016216); // 权重
+    for (int x = -2; x <= 2; ++x) {
+        for (int y = -2; y <= 2; ++y) {
+            float weight = weights[abs(x)] * weights[abs(y)];
+            result += texture(screenTexture, TexCoords + vec2(x, y) * texOffset[0]).rgb * weight;
+        }
+    }
+
+    FragColor = vec4(result, 1.0);
+}
+```
 
 = 小组分工
 
@@ -331,7 +447,7 @@ void Launcher::update(Camera& camera, GLfloat* particle_position, GLubyte* parti
     [姓名], [], [完成内容],
     [陈德建], [], [相关源代码契合 \ 校徽变大过程 \ 高斯模糊],
     [曹越], [], [相关源代码资源搜集 \ 相关源代码契合 \ 校徽形状烟花的创建],
-    [王俊亚], [], [点光源类 \ 烟花的点光源相关逻辑 \ README撰写],
-    [张晋], [], [PPT制作]
+    [王俊亚], [], [点光源类 \ 烟花的点光源相关逻辑 \ README撰写与PPT制作],
+    [张晋], [], [PPT制作 \ BUG测试]
   )
 )
