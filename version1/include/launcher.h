@@ -62,6 +62,7 @@ public:
 	void renderTrails(Particle& p, float deltaTime);
 	void spawnParticle(glm::vec3 position, glm::vec3 speed, glm::vec4 color, float size, float life, Particle::Type type);
 	void explode(Particle& p);
+	void explode2(Particle& p);
 	void launchFirework();
 	void launchFountain();
 
@@ -74,12 +75,12 @@ public:
 	static unsigned int particlesCount;
 
 private:
-	float launchDelay = 0.15f;       /* delay between each launch (seconds) */
+	float launchDelay = 0.25f;       /* delay between each launch (seconds) */
 	float trailDelay = 0.04f;        /* delay between each trail spawn (seconds) */
 	float fountainDelay = 0.05f;
 
 	int sparklesPerExplosion = 300; /* Number of sparkles after explosion */
-	float sparkleLife = 0.9f;       /* lifetime of a sparkle (seconds) */
+	float sparkleLife = 1.2f;       /* lifetime of a sparkle (seconds) */
 	float sparkleSize = 1.3f;
 
 	float trailSize = 1.6f;         /* size of a trail */
