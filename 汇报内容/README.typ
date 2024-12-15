@@ -31,6 +31,8 @@
   )
 )
 
+项目已上传至#link("https://github.com/Le-Poisson/version1")[#text(blue, "GitHub")]。
+
 = 实现过程
 
 本项目中，重要的类(或着色器)及其功能如下所示：
