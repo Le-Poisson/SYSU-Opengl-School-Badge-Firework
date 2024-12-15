@@ -3,7 +3,7 @@
 #include <gl/GL.h>
 #include <math.h>
 
-static const GLfloat cube_color[] = {
+static constexpr GLfloat cube_color[] = {
     0.583f,  0.771f,  0.014f,
     0.609f,  0.115f,  0.436f,
     0.327f,  0.483f,  0.844f,
@@ -42,7 +42,7 @@ static const GLfloat cube_color[] = {
     0.982f,  0.099f,  0.879f
 };
 
-static const GLfloat cube_vertices[] = {
+static constexpr GLfloat cube_vertices[] = {
     -1.0f,-1.0f,-1.0f,
     -1.0f,-1.0f, 1.0f,
     -1.0f, 1.0f, 1.0f,
@@ -81,18 +81,18 @@ static const GLfloat cube_vertices[] = {
     1.0f,-1.0f, 1.0f
 };
 
-static const GLfloat g_vertex_triangle[] = {
+static constexpr GLfloat g_vertex_triangle[] = {
     -1.0f, -1.0f, 0.0f,
     1.0f, -1.0f, 0.0f,
     0.0f,  1.0f, 0.0f,
 };
 
-static const GLfloat quad_color[] = {
+static constexpr GLfloat quad_color[] = {
     0.583f,  0.771f,  0.014f,
     0.609f,  0.115f,  0.436f,
 };
 
-static const GLfloat quad_vertices[] = {
+static constexpr GLfloat quad_vertices[] = {
     -0.5f, -0.5f, 0.0f,
     0.5f, -0.5f, 0.0f,
     -0.5f, 0.5f, 0.0f,
