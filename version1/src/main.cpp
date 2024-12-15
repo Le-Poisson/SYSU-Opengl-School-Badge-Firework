@@ -181,6 +181,38 @@ int main()
     //!!!!!!
     
 
+
+
+    // 创建 quadVAO
+    GLuint quadVAO, quadVBO;
+    float quadVertices[] = {
+        // positions         // texture coords
+        -1.0f,  1.0f, 0.0f,  0.0f, 1.0f, // Top-left
+         1.0f,  1.0f, 0.0f,  1.0f, 1.0f, // Top-right
+         1.0f, -1.0f, 0.0f,  1.0f, 0.0f, // Bottom-right
+        -1.0f, -1.0f, 0.0f,  0.0f, 0.0f  // Bottom-left
+    };
+
+    glGenVertexArrays(1, &quadVAO);
+    glGenBuffers(1, &quadVBO);
+    glBindVertexArray(quadVAO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, quadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+
+    // 设置顶点属性指针
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0); // 位置
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float))); // 纹理坐标
+    glEnableVertexAttribArray(1);
+
+    // 解绑 VAO
+    glBindVertexArray(0);
+
+
+
+
+
     GLuint _particleVAO; // 顶点数组对象
     glGenVertexArrays(1, &_particleVAO); // 生成VAO
     glBindVertexArray(_particleVAO); // 绑定VAO
@@ -217,6 +249,34 @@ int main()
     double lastTime = glfwGetTime(); // FPS计算的时间
 
     glClearColor(0, 0.1f, 0.2f, 0.8f); // 设置清屏颜色
+
+
+
+
+    GLuint fbo;
+    GLuint textureColorBuffer;
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+    // 创建一个纹理来保存渲染结果
+    glGenTextures(1, &textureColorBuffer);
+    glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREEN_W, SCREEN_H, 0, GL_RGB, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureColorBuffer, 0);
+
+    // 检查FBO是否完整
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        std::cout << "帧缓冲对象不完整!" << std::endl;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
+
+
+
+
     // 主循环
     while (!glfwWindowShouldClose(window))
     {
@@ -227,10 +287,11 @@ int main()
             nbFrames = 0; // 重置帧计数
             lastTime += 1.0; // 更新上次时间
         }
+        
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 清除缓冲区
         glEnable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
-
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo);
         Camera::updateDeltaTime(); // 更新相机的时间增量
         launcher.update(*camera, particle_position, particle_color); // 更新粒子
 
@@ -334,6 +395,57 @@ int main()
         //glDisableVertexAttribArray(0);
         glDisableVertexAttribArray(1);
         glDisableVertexAttribArray(2);
+
+        //// 读取窗口像素
+        //int width = (int)SCREEN_W, height = (int)SCREEN_H;
+        //glfwGetFramebufferSize(window, &width, &height);
+        //std::vector<unsigned char> pixels(width* height * 3); // 假设为RGB格式
+
+        //// 读取像素数据
+        //glReadPixels(0, 0, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
+
+        //// 修改像素值
+        //for (int i = 0; i < width * height * 3; i++) {
+        //    int modifiedValue = static_cast<int>(pixels[i] * 1.5f);
+        //    pixels[i] = 255; // 确保不超过255
+        //}
+
+        //glBindTexture(GL_TEXTURE_2D, textureId);
+        //glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, pixels.data());
+        //glBindTexture(GL_TEXTURE_2D, 0);
+
+
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // 3. 应用高斯模糊
+        Shader blurShader("version1/shaders/gaussian_blur.vert", "version1/shaders/gaussian_blur.frag");
+
+        // 计算纹理偏移量
+        glm::vec2 texOffset[25]; // 24 个偏移量
+        float offset = 1.0f; // 偏移量
+
+        for (int x = -2; x <= 2; ++x) {
+            for (int y = -2; y <= 2; ++y) {
+                texOffset[(x + 2) * 5 + (y + 2)] = glm::vec2(x * offset / SCREEN_W, y * offset / SCREEN_H);
+            }
+        }
+
+        glClear(GL_COLOR_BUFFER_BIT); // 清除屏幕颜色缓冲
+
+        blurShader.use();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureColorBuffer);
+        glUniform1i(glGetUniformLocation(blurShader.id, "screenTexture"), 0);
+        glUniform2fv(glGetUniformLocation(blurShader.id, "texOffset"), 4, &texOffset[0][0]);
+
+        // 绑定四边形 VAO 并绘制
+        glBindVertexArray(quadVAO);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4); // 绘制四边形
+        glBindVertexArray(0); // 解绑 VAO
+
+
+
+
+
 
         glfwSwapBuffers(window); // 交换缓冲区
         glfwPollEvents(); // 处理事件

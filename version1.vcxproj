@@ -41,6 +41,8 @@
   <ItemGroup>
     <None Include="version1\shaders\cube.frag" />
     <None Include="version1\shaders\cube.vert" />
+    <None Include="version1\shaders\gaussian_blur.frag" />
+    <None Include="version1\shaders\gaussian_blur.vert" />
     <None Include="version1\shaders\particle.frag" />
     <None Include="version1\shaders\particle.vert" />
     <None Include="version1\shaders\skybox.frag" />

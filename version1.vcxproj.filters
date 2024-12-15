@@ -94,5 +94,11 @@
     <None Include="version1\shaders\terrain.vert">
       <Filter>着色器</Filter>
     </None>
+    <None Include="version1\shaders\gaussian_blur.frag">
+      <Filter>着色器</Filter>
+    </None>
+    <None Include="version1\shaders\gaussian_blur.vert">
+      <Filter>着色器</Filter>
+    </None>
   </ItemGroup>
 </Project>
