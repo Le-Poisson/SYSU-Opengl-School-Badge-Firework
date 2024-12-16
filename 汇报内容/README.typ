@@ -204,7 +204,7 @@ void Launcher::explode2(Particle& p)
 
 == 烟花发射和爆炸音频的导入
 
-我们在网上找到了 13 个烟花发射和 5 个烟花爆炸的音频：
+我们使用 IrrKlang 音频库来实现烟花的音效（我们参考了 @IrrklangProblem 中的方法来配置环境），并且在网上找到了 13 个烟花发射和 5 个烟花爆炸的音频：
 
 ```cpp
 static const char* launchSounds[13] = {
@@ -265,6 +265,7 @@ void Launcher::explode2(Particle& p)
 
 == 地面和天空盒的实现
 
+这一部分参考了教程 @sky
 
 === 地面的实现
 
@@ -619,6 +620,8 @@ void Launcher::update(Camera& camera, GLfloat* particle_position, GLubyte* parti
 
 由于在本项目中，烟花爆炸时产生的点光源并不具有材质，因此基于HDR的泛光并没有使用的前提条件。所以我们直接使用后处理来实现，即直接对输出的像素应用高斯模糊。为此，我们创建了高斯模糊的片段着色器`gaussian_blur.frag`：
 
+（片段着色器的创建参考了文章 @GasussianBlur）
+
 ```GLSL
 #version 460
 out vec4 FragColor;
@@ -756,6 +759,8 @@ glBindVertexArray(0);
 至此，我们完成了作业任务的所有要求，接下来是是对项目的扩展，我们将实现一个爆炸后产生图案的烟花效果。
 
 == 特殊烟花效果
+
+这一部分参考了文章 @TextFirework。
 
 === 实现"A"形烟花
 
@@ -1017,6 +1022,13 @@ for (int i = 0; i < countA; i++)
   caption: [校徽烟花在烟花爆炸中心扩散]
 )
 
+最终效果：
+
+#figure(
+  image("image/混合烟花2.png"),
+  caption: [最终效果]
+)
+
 //************************************************************//
 
 = 实验中遇到的困难总结
@@ -1080,6 +1092,14 @@ for (int i = 0; i < countA; i++)
   kind: table
 )
 
+代码总量2201行（使用vscode插件软著代码生成助手，去除了外部引入的c/cpp文件，以及所有空行和注释）：
+
+#figure(
+  image("image/代码总量.png"),
+  caption: [本项目的代码总量（使用vscode插件软著代码生成助手生成）]
+)
+
+
 //***************参考文献********************//
 
 #set text(font: "Times New Roman", lang: "en", region: "en")
@@ -1087,3 +1107,4 @@ for (int i = 0; i < countA; i++)
 #show bibliography: set heading(numbering: "I")
 
 #bibliography("reference.bib", style: "ieee", title: "参考文献")
+

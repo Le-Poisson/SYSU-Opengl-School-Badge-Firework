@@ -84,8 +84,9 @@
     )
 
     #image("image/混合烟花2.png")  // 替换为你的图片路径
-  ]
   
+  ]
+  pagebreak()
 
   show outline: set text(fill: rgb("#006d12"))
   outline(indent: 2.5em)
