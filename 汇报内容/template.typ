@@ -33,10 +33,20 @@
         icon: text(font: "tabler-icons", "\u{fa19}"),
         color: rgb("#CE412B")
       ),
+      cpp: (
+        name: "C++",
+        icon: text(font: "tabler-icons", "\u{fa19}"),
+        color: rgb("#CE412B")
+      ),
       GLSL: (
         name: "GLSL",
         icon: text(font: "tabler-icons", "\u{fa40}"),
         color: rgb("#2bceab")
+      ),
+      Python: (
+        name: "Python",
+        icon: text(font: "tabler-icons", "\u{fa57}"),
+        color: rgb("#442bce")
       ),
     )
   )
@@ -72,7 +82,10 @@
       [王俊亚], [], [22307049],
       [张晋], [], [22336300]
     )
+
+    #image("image/混合烟花2.png")  // 替换为你的图片路径
   ]
+  
 
   show outline: set text(fill: rgb("#006d12"))
   outline(indent: 2.5em)
