@@ -1,6 +1,6 @@
 # SYSU计算机图形学大作业 烟花粒子系统项目——GCY班第20小组
 
-<img src="img/test.png" style="width: 500pt; height: auto;">
+<img src="img/test.png">
 
 ## 一、项目介绍
 
